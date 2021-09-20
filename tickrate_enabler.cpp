@@ -53,8 +53,8 @@
 #else
 #define VDEBUG ""
 #endif
-#define VERSION_L4D "1.4"
-#define VERSION_L4D2 "1.4"
+#define VERSION_L4D "1.5"
+#define VERSION_L4D2 "1.5"
 #if defined (_L4D)
 #define VERSION VERSION_L4D VDEBUG
 #elif defined (_L4D2)
@@ -63,25 +63,9 @@
 
 //
 L4DTickRate g_L4DTickRatePlugin;
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR(L4DTickRate, IServerPluginCallbacks, INTERFACEVERSION_ISERVERPLUGINCALLBACKS, g_L4DTickRatePlugin );
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR(L4DTickRate, IServerPluginCallbacks, INTERFACEVERSION_ISERVERPLUGINCALLBACKS, g_L4DTickRatePlugin);
 
-//---------------------------------------------------------------------------------
-// Purpose: constructor/destructor
-//---------------------------------------------------------------------------------
-L4DTickRate::L4DTickRate()
-{
-}
-
-L4DTickRate::~L4DTickRate()
-{
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called once per server frame, do recurring work here (like checking for timeouts)
-//---------------------------------------------------------------------------------
-void L4DTickRate::GameFrame( bool simulating )
-{
-}
+L4DTickRate::L4DTickRate() {}
 
 SourceHook::Impl::CSourceHookImpl g_SourceHook;
 SourceHook::ISourceHook *g_SHPtr = &g_SourceHook;
@@ -106,35 +90,6 @@ float GetTickInterval()
 
 IServerGameDLL *gamedll = NULL;
 IVEngineServer *engine = NULL;
-
-void * SearchForInterfaceName(CreateInterfaceFn factory, char name[])
-{
-	size_t namelen = strlen(name), cnt = 0;
-	void * pIface;
-	while(cnt < 100)
-	{
-		for(size_t i = namelen-1; i >= namelen-3; i--)
-		{
-			if(name[i] == '9')
-			{
-				name[i]='0';
-			} 
-			else
-			{
-				name[i]++;
-				break;
-			}
-		}
-		pIface = (void*)factory(name,NULL);
-		if(pIface != NULL)
-		{
-			return pIface;
-		}
-		cnt++;
-	}
-	return NULL;
-}
-
 ICvar * g_pCvar = NULL;
 
 //---------------------------------------------------------------------------------
@@ -142,21 +97,14 @@ ICvar * g_pCvar = NULL;
 //---------------------------------------------------------------------------------
 bool L4DTickRate::Load(	CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory )
 {
-	char aServerGameDLL[] = "ServerGameDLL000";
-	gamedll = (IServerGameDLL *)SearchForInterfaceName(gameServerFactory, aServerGameDLL);
+	gamedll = (IServerGameDLL *)gameServerFactory(INTERFACEVERSION_SERVERGAMEDLL, NULL);
 	if(!gamedll)
 	{
 		Error("Tickrate_Enabler: Failed to get a pointer on ServerGameDLL.\n");
 		return false;
 	}
 
-	char aVEngineServer[] = "VEngineServer000";
-	engine = (IVEngineServer *)SearchForInterfaceName(interfaceFactory, aVEngineServer);
-
-
-
-	Msg("Tickrate_Enabler: Found ServerGameDLL at %s\n", aServerGameDLL);
-	Msg("Tickrate_Enabler: Found VEngineServer at %s\n", aVEngineServer);
+	engine = (IVEngineServer *)interfaceFactory(INTERFACEVERSION_VENGINESERVER, NULL);
 
 	SH_ADD_HOOK(IServerGameDLL, GetTickInterval, gamedll, SH_STATIC(GetTickInterval), false);
 
@@ -211,117 +159,9 @@ void L4DTickRate::Unload( void )
 }
 
 //---------------------------------------------------------------------------------
-// Purpose: called when the plugin is paused (i.e should stop running but isn't unloaded)
-//---------------------------------------------------------------------------------
-void L4DTickRate::Pause( void )
-{
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called when the plugin is unpaused (i.e should start executing again)
-//---------------------------------------------------------------------------------
-void L4DTickRate::UnPause( void )
-{
-}
-
-//---------------------------------------------------------------------------------
 // Purpose: the name of this plugin, returned in "plugin_print" command
 //---------------------------------------------------------------------------------
 const char *L4DTickRate::GetPluginDescription( void )
 {
 	return "Tickrate_Enabler " VERSION ", ProdigySim";
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called on level start
-//---------------------------------------------------------------------------------
-void L4DTickRate::LevelInit( char const *pMapName )
-{
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called on level start, when the server is ready to accept client connections
-//		edictCount is the number of entities in the level, clientMax is the max client count
-//---------------------------------------------------------------------------------
-void L4DTickRate::ServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
-{
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called on level end (as the server is shutting down or going to a new map)
-//---------------------------------------------------------------------------------
-void L4DTickRate::LevelShutdown( void ) // !!!!this can get called multiple times per map change
-{
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called when a client spawns into a server (i.e as they begin to play)
-//---------------------------------------------------------------------------------
-void L4DTickRate::ClientActive( edict_t *pEntity )
-{
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called when a client leaves a server (or is timed out)
-//---------------------------------------------------------------------------------
-void L4DTickRate::ClientDisconnect( edict_t *pEntity )
-{
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called on 
-//---------------------------------------------------------------------------------
-void L4DTickRate::ClientPutInServer( edict_t *pEntity, char const *playername )
-{
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called on level start
-//---------------------------------------------------------------------------------
-void L4DTickRate::SetCommandClient( int index )
-{
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called on level start
-//---------------------------------------------------------------------------------
-void L4DTickRate::ClientSettingsChanged( edict_t *pEdict )
-{
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called when a client joins a server
-//---------------------------------------------------------------------------------
-PLUGIN_RESULT L4DTickRate::ClientConnect( bool *bAllowConnect, edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
-{
-	return PLUGIN_CONTINUE;
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called when a client types in a command (only a subset of commands however, not CON_COMMAND's)
-//---------------------------------------------------------------------------------
-PLUGIN_RESULT L4DTickRate::ClientCommand( edict_t *pEntity, const CCommand &args )
-{
-	return PLUGIN_CONTINUE;
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called when a client is authenticated
-//---------------------------------------------------------------------------------
-PLUGIN_RESULT L4DTickRate::NetworkIDValidated( const char *pszUserName, const char *pszNetworkID )
-{
-	return PLUGIN_CONTINUE;
-}
-
-//---------------------------------------------------------------------------------
-// Purpose: called when a cvar value query is finished
-//---------------------------------------------------------------------------------
-void L4DTickRate::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue )
-{
-}
-void L4DTickRate::OnEdictAllocated( edict_t *edict )
-{
-}
-void L4DTickRate::OnEdictFreed( const edict_t *edict  )
-{
 }

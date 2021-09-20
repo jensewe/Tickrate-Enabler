@@ -1,6 +1,4 @@
-## Tickrate Enabler 1.4 by ProdigySim
-
-https://www.l4dnation.com/confogl-and-other-configs/l4d12-tickrate-enabler-1-0/
+## Tickrate Enabler by ProdigySim
 
 ### Description
 
@@ -29,9 +27,13 @@ and removes the (30k) limits on rate control cvars:
 	
 	Note that fps_max and sv_maxrate are hidden variables on most scenarios.
 
-5. Done. Enjoy 100 tick L4D2 gameplay.
+5. Done. Enjoy 100 tick L4D/L4D2 gameplay.
 
 ### Changelog / TODO
+
+1.5: Contributed by Accelerator  
+- Fixed CVomit::UpdateAbility offsets.  
+- Some code optimization  
 
 1.4: Contributed by $atanic $pirit  
 - Fixed L4D2 CVomit::UpdateAbility Windows offsets.

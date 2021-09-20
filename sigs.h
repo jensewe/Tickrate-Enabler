@@ -54,24 +54,24 @@ const int g_FrameTimeReadOffsets[] =
 #if defined (_L4D)
 	{0x13D, 0x380}; // L4D1 LINUX
 #elif defined (_L4D2)
-	{0x12D, 0x5FD}; // L4D2 LINUX
+	{0x13D, 0x5FE}; // L4D2 LINUX
 #endif
 #elif defined (_WIN32)
 #if defined (_L4D)
-	{0x173, 0x2CD, 0x476};
-	/* 371, 717, 1142 */
+	{0x17B, 0x2D5, 0x476};
+	/* 379, 725, 1142 */
 	/* 
-	0x173	=	371		= .text:102CEB33 A1 B0 9A 5E 10                          mov     eax, dword_105E9AB0
-	0x2CD	=	717 	= .text:102CEC8D A1 B0 9A 5E 10                          mov     eax, dword_105E9AB0
-	0x476	=	1142	= .text:102CEE36 A1 B0 9A 5E 10                          mov     eax, dword_105E9AB0
+	0x17B	=	379		= .text:102D047B A1 B0 BA 5E 10                    mov     eax, dword_105EBAB0
+	0x2D5	=	725 	= .text:102D05D5 A1 B0 BA 5E 10                          mov     eax, dword_105EBAB0
+	0x476	=	1142	= .text:102D0776 A1 B0 BA 5E 10                          mov     eax, dword_105EBAB0
 	*/
 #elif defined (_L4D2)
-	{0x1DC, 0x36E, 0x533};
-	/* 476, 878, 1331 */
+	{0x1E4, 0x376, 0x543};
+	/* 484, 886, 1347 */
 	/* 
-	0x1DC	=	476		= .text:1035C3CC A1 E8 1B 7D 10                          mov     eax, dword_107D1BE8
-	0x36E	=	878 	= .text:1035C55E A1 E8 1B 7D 10                          mov     eax, dword_107D1BE8
-	0x533	=	1331	= .text:1035C723 A1 E8 1B 7D 10                          mov     eax, dword_107D1BE8
+	0x1E4	=	484		= .text:1036ED34 A1 90 35 7F 10                          mov     eax, dword_107F3590
+	0x376	=	886 	= .text:1036EEC6 A1 90 35 7F 10                          mov     eax, dword_107F3590
+	0x543	=	1347	= .text:1036F093 A1 90 35 7F 10                          mov     eax, dword_107F3590
 	*/
 #endif
 #endif

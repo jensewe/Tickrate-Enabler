@@ -143,8 +143,8 @@ class ExtensionConfig(object):
       '_stricmp=strcasecmp',
       '_snprintf=snprintf',
       '_vsnprintf=vsnprintf',
-      #'HAVE_STDINT_H',
-      #'GNUC',
+      'HAVE_STDINT_H',
+      'GNUC',
     ]
     cxx.cflags += [
       '-pipe',
@@ -157,23 +157,22 @@ class ExtensionConfig(object):
       '-msse',
       '-m32',
       '-fvisibility=hidden',
-	  '-fexceptions',
     ]
     cxx.cxxflags += [
-      '-std=c++11',
-      '-fno-exceptions',
+      '-std=c++14',
+      #'-fno-exceptions',
       '-fno-threadsafe-statics',
       '-Wno-non-virtual-dtor',
       '-Wno-overloaded-virtual',
-	  '-Wno-uninitialized',
-	  '-Wno-return-type',
+      '-Wno-uninitialized',
       '-fvisibility-inlines-hidden',
-	  '-fexceptions',
     ]
     cxx.linkflags += ['-m32']
 
     have_gcc = cxx.vendor == 'gcc'
     have_clang = cxx.vendor == 'clang'
+    if cxx.version >= 'clang-3.9' or cxx.version >= 'apple-clang-10.0':
+      cxx.cxxflags += ['-Wno-expansion-to-defined']
     if cxx.version >= 'clang-3.6':
       cxx.cxxflags += ['-Wno-inconsistent-missing-override']
     if have_clang or (cxx.version >= 'gcc-4.6'):
@@ -191,11 +190,21 @@ class ExtensionConfig(object):
         cxx.cxxflags += ['-Wno-deprecated']
       cxx.cflags += ['-Wno-sometimes-uninitialized']
 
+    # Work around SDK warnings.
+    if cxx.version >= 'clang-10.0':
+      cxx.cflags += [
+        '-Wno-implicit-int-float-conversion',
+        '-Wno-tautological-overlap-compare',
+      ]
+
     if have_gcc:
       cxx.cflags += ['-mfpmath=sse']
 
     if builder.options.opt == '1':
       cxx.cflags += ['-O3']
+
+    # Don't omit the frame pointer.
+    cxx.cflags += ['-fno-omit-frame-pointer']
 
   def configure_msvc(self, cxx):
     if builder.options.debug == '1':
@@ -249,7 +258,6 @@ class ExtensionConfig(object):
     cxx.linkflags += ['-lm']
     if cxx.vendor == 'gcc':
       cxx.linkflags += ['-static-libgcc']
-      cxx.linkflags += ['-static-libstdc++']
     elif cxx.vendor == 'clang':
       cxx.linkflags += ['-lgcc_eh']
 
@@ -270,13 +278,7 @@ class ExtensionConfig(object):
   def ConfigureForExtension(self, context, compiler):
     compiler.cxxincludes += [
       os.path.join(context.currentSourcePath),
-      os.path.join(context.currentSourcePath, 'sdk'),
-      os.path.join(self.sm_root, 'public'),
-      os.path.join(self.sm_root, 'public', 'extensions'),
-	  os.path.join(self.sm_root, 'core', 'logic'),
-      os.path.join(self.sm_root, 'sourcepawn', 'include'),
-      os.path.join(self.sm_root, 'public', 'amtl', 'amtl'),
-      os.path.join(self.sm_root, 'public', 'amtl'),
+      os.path.join(self.sm_root, 'core', 'logic'),
     ]
     return compiler
 
@@ -292,7 +294,7 @@ class ExtensionConfig(object):
       os.path.join(mms_path),
       os.path.join(mms_path, 'sourcehook'),
     ]
-	
+
     defines = ['SE_' + PossibleSDKs[i].define + '=' + PossibleSDKs[i].code for i in PossibleSDKs]
     compiler.defines += defines
 
