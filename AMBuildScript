@@ -159,12 +159,13 @@ class ExtensionConfig(object):
       '-fvisibility=hidden',
     ]
     cxx.cxxflags += [
-      '-std=c++14',
+      '-std=c++17',
       #'-fno-exceptions',
       '-fno-threadsafe-statics',
       '-Wno-non-virtual-dtor',
       '-Wno-overloaded-virtual',
       '-Wno-uninitialized',
+      '-Wno-register',
       '-fvisibility-inlines-hidden',
     ]
     cxx.linkflags += ['-m32']
@@ -225,6 +226,7 @@ class ExtensionConfig(object):
       '/EHsc',
       '/GR-',
       '/TP',
+      '/std:c++17',
     ]
     cxx.linkflags += [
       '/MACHINE:X86',
