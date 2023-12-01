@@ -3,11 +3,17 @@ name: l4d2-build
 on:
   push:
     branches:
+      - main
       - master
+    tags:
+      - '*'
     paths-ignore:
       - LICENSE
       - README.md
   pull_request:
+    branches:
+      - main
+      - master
     paths-ignore:
       - LICENSE
       - README.md
@@ -29,11 +35,11 @@ jobs:
           - "master"
 
         mm_version:
-          - "master"
+          - "1.12-dev"
 
         include:
-          - mm_version: "master"
-            mm_branch: "master"
+          - mm_version: "1.12-dev"
+            mm_branch: "1.12-dev"
 
           - sm_version: "master"
             sm_branch: "master"
@@ -77,14 +83,14 @@ jobs:
           )
 
       - name: Checking out SourceMod
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: alliedmodders/sourcemod
           ref: ${{ matrix.sm_branch }}
           path: sourcemod-${{ matrix.sm_version }}
 
       - name: Checking out MM:Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: alliedmodders/metamod-source
           ref: ${{ matrix.mm_branch }}
@@ -93,7 +99,7 @@ jobs:
       - name: Setting up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.11'
 
       - name: Setting up ambuild
         run: |
@@ -101,14 +107,14 @@ jobs:
           pip install git+https://github.com/accelerator74/ambuild
 
       - name: Checking out hl2sdk-l4d2
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: alliedmodders/hl2sdk
           ref: l4d2
           path: hl2sdk-l4d2
 
       - name: Checking out own repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: src
 
@@ -123,5 +129,5 @@ jobs:
       - name: Uploading package
         uses: actions/upload-artifact@v3
         with:
-          name: Tickrate-Enabler-l4d2-${{ env.GITHUB_SHA_SHORT }}
+          name: ${{ github.event.repository.name }}-l4d2-${{ env.GITHUB_SHA_SHORT }}
           path: src/build/package
