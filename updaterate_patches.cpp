@@ -76,7 +76,8 @@ ICodePatch * CGameClientUpdateRatePatch::GeneratePatch(BYTE * pCGameClientUpdate
 		throw PatchException("CGameClient::SetUpdateRate patch offset incorrect!");
 	}
 #if defined _WIN32
-	return new BasicStaticBinPatch<sizeof(JMP_8_OPCODE)>(pCGameClientUpdateRate+CGAMECLIENT_SETUPDATERATE_PATCH_OFFSET, JMP_8_OPCODE);
+	const BYTE replacement[] = {JMP_8_OPCODE};
+	return new BasicStaticBinPatch<sizeof(replacement)>(pCGameClientUpdateRate+CGAMECLIENT_SETUPDATERATE_PATCH_OFFSET, replacement);
 #elif defined _LINUX
 	return new BasicStaticBinPatch<sizeof(NOP_2)>(pCGameClientUpdateRate+CGAMECLIENT_SETUPDATERATE_PATCH_OFFSET, NOP_2);
 #endif
@@ -122,7 +123,8 @@ ICodePatch * CBaseClientUpdateRatePatch::GeneratePatch(BYTE * pCBaseClientUpdate
 		throw PatchException("CBaseClient::SetUpdateRate patch offset incorrect!");
 	}
 #if defined _WIN32
-	return new BasicStaticBinPatch<sizeof(JMP_8_OPCODE)>(pCBaseClientUpdateRate+CBASECLIENT_SETUPDATERATE_PATCH_OFFSET, JMP_8_OPCODE);
+	const BYTE replacement[] = {JMP_8_OPCODE};
+	return new BasicStaticBinPatch<sizeof(replacement)>(pCBaseClientUpdateRate+CBASECLIENT_SETUPDATERATE_PATCH_OFFSET, replacement);
 #elif defined _LINUX
 	const BYTE replacement[] = {0x89, 0xC2, NOP_1[0]};
 	return new BasicStaticBinPatch<sizeof(replacement)>(pCBaseClientUpdateRate+CBASECLIENT_SETUPDATERATE_PATCH_OFFSET-1, replacement);
