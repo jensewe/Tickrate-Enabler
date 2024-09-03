@@ -54,8 +54,8 @@
 #else
 #define VDEBUG ""
 #endif
-#define VERSION_L4D "1.5"
-#define VERSION_L4D2 "1.5"
+#define VERSION_L4D "1.6"
+#define VERSION_L4D2 "1.6"
 #if defined (_L4D)
 #define VERSION VERSION_L4D VDEBUG
 #elif defined (_L4D2)
