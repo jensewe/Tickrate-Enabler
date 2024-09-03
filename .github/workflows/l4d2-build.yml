@@ -23,11 +23,11 @@ on:
 jobs:
   build:
     name: build on ${{ matrix.os_short }} SM-${{ matrix.sm_version }} MMS-${{ matrix.mm_version }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{matrix.os123456}}
     strategy:
       fail-fast: false
       matrix:
-        os:
+        os123456:
           - ubuntu-latest
           - ubuntu-22.04
           - windows-latest
@@ -52,13 +52,13 @@ jobs:
           - sm_version: "1.11"
             sm_branch: "1.11-dev"
 
-          - os: ubuntu-22.04
+          - os123456: ubuntu-22.04
             os_short: oldlinux
 
-          - os: ubuntu-latest
+          - os123456: ubuntu-latest
             os_short: linux
 
-          - os: windows-latest
+          - os123456: windows-latest
             os_short: win
 
     steps:
