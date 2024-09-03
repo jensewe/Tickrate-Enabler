@@ -28,6 +28,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
+          - ubuntu-22.04
           - ubuntu-latest
           - windows-latest
 
@@ -44,6 +45,9 @@ jobs:
           - sm_version: "master"
             sm_branch: "master"
 
+          - os: ubuntu-22.04
+            os_short: oldlinux
+            
           - os: ubuntu-latest
             os_short: linux
 
