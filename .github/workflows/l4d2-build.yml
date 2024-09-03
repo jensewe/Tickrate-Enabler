@@ -22,13 +22,14 @@ on:
 
 jobs:
   build:
-    name: build on ${{ matrix.os_short }} SM-${{ matrix.sm_version }} MMS-${{ matrix.mm_version }}
+    name: build on ${{ matrix.os_short }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
+          - ubuntu-22.04
           - windows-latest
 
         sm_version:
