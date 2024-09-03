@@ -40,9 +40,6 @@ jobs:
           - "1.10"
 
         include:
-          - mm_version: "master"
-            mm_branch: "master"
-
           - mm_version: "1.10"
             mm_branch: "1.10-dev"
 
