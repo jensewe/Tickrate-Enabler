@@ -29,7 +29,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - ubuntu-22.04
           - windows-latest
 
         sm_version:
