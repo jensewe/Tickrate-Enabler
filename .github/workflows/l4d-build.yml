@@ -29,15 +29,15 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
+          - ubuntu-22.04
           - windows-latest
 
         sm_version:
           - "master"
-          - "1.10"
+          - "1.11"
 
         mm_version:
-          # - "master"
-          - "1.11"
+          - "1.10"
 
         include:
           - mm_version: "master"
