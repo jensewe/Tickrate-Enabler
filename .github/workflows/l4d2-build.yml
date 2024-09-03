@@ -45,14 +45,14 @@ jobs:
           - sm_version: "1.11"
             sm_branch: "1.11-dev"
 
-          - os: ubuntu-22.04
-            os_short: oldlinux
+          - os: "ubuntu-22.04"
+            os_short: "oldlinux"
 
-          - os: ubuntu-latest
-            os_short: linux
+          - os: "ubuntu-latest"
+            os_short: "linux"
 
-          - os: windows-latest
-            os_short: win
+          - os: "windows-latest"
+            os_short: "win"
 
     name: build on ${{ matrix.os_short }} SM-${{ matrix.sm_version }} MMS-${{ matrix.mm_version }}
     runs-on: ${{ matrix.os }}
