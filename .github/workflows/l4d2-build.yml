@@ -22,8 +22,6 @@ on:
 
 jobs:
   build:
-    name: build on ${{ matrix.os_short }} SM-${{ matrix.sm_version }} MMS-${{ matrix.mm_version }}
-    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -61,6 +59,8 @@ jobs:
           - os: windows-latest
             os_short: win
 
+    runs-on: ${{ matrix.os }}
+    name: build on ${{ matrix.os_short }} SM-${{ matrix.sm_version }} MMS-${{ matrix.mm_version }}
     steps:
       - name: Prepare env
         shell: bash
