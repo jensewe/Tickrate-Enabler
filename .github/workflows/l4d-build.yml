@@ -22,7 +22,7 @@ on:
 
 jobs:
   build:
-    name: build on ${{ matrix.os_short }}
+    name: build on ${{ matrix.os_short }} SM-${{ matrix.sm_version }} MMS-${{ matrix.mm_version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -34,20 +34,28 @@ jobs:
 
         sm_version:
           - "master"
+          - "1.10"
 
         mm_version:
-          - "master"
+          # - "master"
+          - "1.11"
 
         include:
           - mm_version: "master"
             mm_branch: "master"
 
+          - mm_version: "1.10"
+            mm_branch: "1.10-dev"
+
           - sm_version: "master"
             sm_branch: "master"
 
+          - sm_version: "1.11"
+            sm_branch: "1.11-dev"
+
           - os: ubuntu-22.04
             os_short: oldlinux
-            
+
           - os: ubuntu-latest
             os_short: linux
 
