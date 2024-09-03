@@ -22,16 +22,9 @@ on:
 
 jobs:
   build:
-    name: build on ${{ matrix.os_short }} SM-${{ matrix.sm_version }} MMS-${{ matrix.mm_version }}
-    runs-on: ${{matrix.os123456}}
     strategy:
       fail-fast: false
       matrix:
-        os123456:
-          - ubuntu-latest
-          - ubuntu-22.04
-          - windows-latest
-
         sm_version:
           - "master"
           - "1.10"
@@ -52,15 +45,17 @@ jobs:
           - sm_version: "1.11"
             sm_branch: "1.11-dev"
 
-          - os123456: ubuntu-22.04
+          - os: ubuntu-22.04
             os_short: oldlinux
 
-          - os123456: ubuntu-latest
+          - os: ubuntu-latest
             os_short: linux
 
-          - os123456: windows-latest
+          - os: windows-latest
             os_short: win
 
+    name: build on ${{ matrix.os_short }} SM-${{ matrix.sm_version }} MMS-${{ matrix.mm_version }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Prepare env
         shell: bash
