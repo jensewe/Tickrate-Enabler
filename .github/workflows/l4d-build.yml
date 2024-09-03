@@ -137,5 +137,5 @@ jobs:
       - name: Uploading package
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.repository.name }}-l4d-${{ matrix.os_short }}-${{ env.GITHUB_SHA_SHORT }}
+          name: ${{ github.event.repository.name }}-l4d-${{ matrix.os_short }}-sm${{ matrix.sm_version }}-${{ env.GITHUB_SHA_SHORT }}
           path: src/build/package
