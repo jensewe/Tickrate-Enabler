@@ -31,6 +31,9 @@ and removes the (30k) limits on rate control cvars:
 
 ### Changelog / TODO
 
+1.6:
+- Patch SetUpdateRate to allow tickrate > 100 (Thanks to jensewe)
+
 1.5: Contributed by Accelerator  
 - Fixed CVomit::UpdateAbility offsets.  
 - Some code optimization  
