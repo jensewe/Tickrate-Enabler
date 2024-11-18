@@ -44,7 +44,6 @@
 
 #include "boomervomitpatch.h"
 #include "maxrate_patches.h"
-#include "updaterate_patches.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -54,8 +53,8 @@
 #else
 #define VDEBUG ""
 #endif
-#define VERSION_L4D "1.6"
-#define VERSION_L4D2 "1.6"
+#define VERSION_L4D "1.5"
+#define VERSION_L4D2 "1.5"
 #if defined (_L4D)
 #define VERSION VERSION_L4D VDEBUG
 #elif defined (_L4D2)
@@ -119,8 +118,6 @@ bool L4DTickRate::Load(	CreateInterfaceFn interfaceFactory, CreateInterfaceFn ga
 #if defined (CLAMPCLIENTRATE_PATCH)
 		m_patchManager.Register(new ClampClientRatePatch((BYTE *)engine));
 #endif
-		m_patchManager.Register(new CGameClientUpdateRatePatch((BYTE *)engine));
-		m_patchManager.Register(new CBaseClientUpdateRatePatch((BYTE *)engine));
 		
 		m_patchManager.PatchAll();
 	}

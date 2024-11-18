@@ -10,7 +10,6 @@ sourceFiles = [
   'memutils.cpp',
   'maxrate_patches.cpp',
   'boomervomitpatch.cpp',
-  'updaterate_patches.cpp',
 
   os.path.join(Extension.mms_root, 'core', 'sourcehook', 'sourcehook.cpp'),
   os.path.join(Extension.mms_root, 'core', 'sourcehook', 'sourcehook_impl_chookidman.cpp'),
