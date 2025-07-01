@@ -93,6 +93,7 @@ jobs:
           repository: alliedmodders/sourcemod
           ref: ${{ matrix.sm_branch }}
           path: sourcemod-${{ matrix.sm_version }}
+          submodules: recursive
 
       - name: Checking out MM:Source
         uses: actions/checkout@v4
