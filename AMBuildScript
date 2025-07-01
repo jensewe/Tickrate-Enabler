@@ -134,6 +134,8 @@ class ExtensionConfig(object):
 
     # Finish up.
     cxx.includes += [
+      os.path.join(self.sm_root, 'public', 'amtl', 'amtl'),
+      os.path.join(self.sm_root, 'public', 'amtl'),
       os.path.join(self.sm_root, 'public'),
     ]
 
