@@ -1,6 +1,7 @@
 name: l4d-build
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -29,23 +30,27 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
+          - ubuntu-22.04
           - windows-latest
 
         sm_version:
           - "master"
 
         mm_version:
-          - "master"
+          - "1.12"
 
         include:
-          - mm_version: "master"
-            mm_branch: "master"
+          - mm_version: "1.12"
+            mm_branch: "1.12-dev"
 
           - sm_version: "master"
             sm_branch: "master"
 
           - os: ubuntu-latest
             os_short: linux
+
+          - os: ubuntu-22.04
+            os_short: oldlinux
 
           - os: windows-latest
             os_short: win
