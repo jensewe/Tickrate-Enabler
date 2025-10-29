@@ -33,10 +33,10 @@ for cxx_task in Extension.extensions:
 
 # VDF file
 if builder.options.sdks == 'l4d':
-  CopyFiles('', 'addons',
+  CopyFiles('extra', 'addons',
   [ 'tickrate_enabler_l4d1.vdf' ]
 )
 if builder.options.sdks == 'l4d2':
-  CopyFiles('', 'addons',
+  CopyFiles('extra', 'addons',
   [ 'tickrate_enabler.vdf' ]
 )

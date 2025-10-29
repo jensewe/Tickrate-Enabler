@@ -1,8 +1,9 @@
 /**
  * vim: set ts=4 :
  * =============================================================================
- * MaxRate Patches
+ * ICodePatch
  * Copyright (C) 2012 Michael "ProdigySim" Busby
+ * Copyright (C) 2009 Igor "Downtown1" Smirnov.
  * =============================================================================
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -28,65 +29,32 @@
  *
  * Version: $Id$
  */
-#ifndef __MAXRATE_PATCHES_H__
-#define __MAXRATE_PATCHES_H__
 
-#include "codepatch/icodepatch.h"
-#include "misc_asm.h"
+#ifndef _INCLUDE_SOURCEMOD_ICODEPATCH_H_
+#define _INCLUDE_SOURCEMOD_ICODEPATCH_H_
 
-#if defined (_WIN32)
-	#define CGAMECLIENT_PATCH
-#if defined (_L4D2)
-	#define CLAMPCLIENTRATE_PATCH
-#endif
-#elif defined (_LINUX)
-	#define CLAMPCLIENTRATE_PATCH
-#if defined (_L4D)
-	#define CGAMECLIENT_PATCH
-#endif
-#endif
+/*
+A simple interface for a patch that can change code memory or restore it to the original state
 
-class NetChanDataRatePatch : public ICodePatch
+NOTE: To use this with PatchManager make sure to inherit public ICodePatch
+*/
+class ICodePatch
 {
 public:
-	NetChanDataRatePatch(BYTE * engine);
-	~NetChanDataRatePatch();
-	void Patch();
-	void Unpatch();
-private:
-	BYTE * FindCNetChanSetDataRate(BYTE * engine);
-	ICodePatch * GeneratePatch(BYTE * pCNetChanSetDataRate);
-	ICodePatch * m_patch;
-};
+	/* 
+		patch the code memory
+	*/
+	virtual void Patch() = 0;
 
-#if defined (CGAMECLIENT_PATCH)
-class GameClientSetRatePatch : public ICodePatch
-{
-public:
-	GameClientSetRatePatch(BYTE * engine);
-	~GameClientSetRatePatch();
-	void Patch();
-	void Unpatch();
-private:
-	BYTE * FindCGameClientSetRate(BYTE * engine);
-	ICodePatch * GeneratePatch(BYTE * pCGameClientSetRate);
-	ICodePatch * m_patch;
-};
-#endif
+	/*
+		unpatch the code memory, restoring it to its original state
+	*/
+	virtual void Unpatch() = 0;
 
-#if defined (CLAMPCLIENTRATE_PATCH)
-class ClampClientRatePatch : public ICodePatch
-{
-public:
-	ClampClientRatePatch(BYTE * engine);
-	~ClampClientRatePatch();
-	void Patch();
-	void Unpatch();
-private:
-	BYTE * FindClampClientRate(BYTE * engine);
-	ICodePatch * GeneratePatch(BYTE * pClampClientRate);
-	ICodePatch * m_patch;
+	/*
+		so that we can delete
+	*/
+	virtual ~ICodePatch() {}
 };
-#endif
 
 #endif

@@ -1,7 +1,7 @@
 /**
  * vim: set ts=4 :
  * =============================================================================
- * BoomerVomitPatch
+ * MaxRate Patches
  * Copyright (C) 2012 Michael "ProdigySim" Busby
  * =============================================================================
  *
@@ -28,30 +28,65 @@
  *
  * Version: $Id$
  */
-#ifndef __BOOMERVOMITPATCH_H__
-#define __BOOMERVOMITPATCH_H__
+#ifndef __MAXRATE_PATCHES_H__
+#define __MAXRATE_PATCHES_H__
 
-#include "eiface.h"
-#include "codepatch/icodepatch.h"
-#include "codepatch/patchmanager.h"
-#include "basicbinpatch.h"
+#include "thirdparty/codepatch/icodepatch.h"
 #include "misc_asm.h"
-#include "sigs.h"
 
-class BoomerVomitFrameTimePatch : public ICodePatch
+#if defined (_WIN32)
+	#define CGAMECLIENT_PATCH
+#if defined (_L4D2)
+	#define CLAMPCLIENTRATE_PATCH
+#endif
+#elif defined (_LINUX)
+	#define CLAMPCLIENTRATE_PATCH
+#if defined (_L4D)
+	#define CGAMECLIENT_PATCH
+#endif
+#endif
+
+class NetChanDataRatePatch : public ICodePatch
 {
 public:
-	BoomerVomitFrameTimePatch(IServerGameDLL * gamedll);
-	~BoomerVomitFrameTimePatch();
+	NetChanDataRatePatch(BYTE * engine);
+	~NetChanDataRatePatch();
 	void Patch();
 	void Unpatch();
 private:
-	void InitializeBinPatches(IServerGameDLL * gamedll);
-	BYTE * FindCVomitUpdateAbility(void * gamedll);
-	PatchManager m_patches;
+	BYTE * FindCNetChanSetDataRate(BYTE * engine);
+	ICodePatch * GeneratePatch(BYTE * pCNetChanSetDataRate);
+	ICodePatch * m_patch;
 };
 
-// Deprecated
-//bool PatchBoomerVomit(IServerGameDLL * gamedll);
+#if defined (CGAMECLIENT_PATCH)
+class GameClientSetRatePatch : public ICodePatch
+{
+public:
+	GameClientSetRatePatch(BYTE * engine);
+	~GameClientSetRatePatch();
+	void Patch();
+	void Unpatch();
+private:
+	BYTE * FindCGameClientSetRate(BYTE * engine);
+	ICodePatch * GeneratePatch(BYTE * pCGameClientSetRate);
+	ICodePatch * m_patch;
+};
+#endif
+
+#if defined (CLAMPCLIENTRATE_PATCH)
+class ClampClientRatePatch : public ICodePatch
+{
+public:
+	ClampClientRatePatch(BYTE * engine);
+	~ClampClientRatePatch();
+	void Patch();
+	void Unpatch();
+private:
+	BYTE * FindClampClientRate(BYTE * engine);
+	ICodePatch * GeneratePatch(BYTE * pClampClientRate);
+	ICodePatch * m_patch;
+};
+#endif
 
 #endif
