@@ -28,7 +28,7 @@
  *
  * Version: $Id$
  */
-#include <cstdlib>
+
 #include "thirdparty/memutils.h"
 #include "thirdparty/sm_convar.h"
 #include "tier0/icommandline.h"
@@ -48,20 +48,8 @@
  // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef _DEBUG
-#define VDEBUG "-dev"
-#else
-#define VDEBUG ""
-#endif
-#define VERSION_L4D "1.5"
-#define VERSION_L4D2 "1.5"
-#if defined (_L4D)
-#define VERSION VERSION_L4D VDEBUG
-#elif defined (_L4D2)
-#define VERSION VERSION_L4D2 VDEBUG
-#endif
+#define TE_VERSION "1.5.2"
 
-//
 L4DTickRate g_L4DTickRatePlugin;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(L4DTickRate, IServerPluginCallbacks, INTERFACEVERSION_ISERVERPLUGINCALLBACKS, g_L4DTickRatePlugin);
 
@@ -71,76 +59,87 @@ int g_PLID = 0;
 
 SH_DECL_HOOK0(IServerGameDLL, GetTickInterval, const, 0, float);
 
-float GetTickInterval()
-{
-	float tickinterval = (1.0f / 30.0f);
+IServerGameDLL* g_pGameDll = NULL;
+IVEngineServer* g_pEngine = NULL;
+ICvar* g_pCvar = NULL;
 
-	if (CommandLine()->CheckParm("-tickrate"))
-	{
-		float tickrate = CommandLine()->ParmValue("-tickrate", 0);
-		Msg("Tickrate_Enabler: Read TickRate %f\n", tickrate);
-		if (tickrate > 10)
-			tickinterval = 1.0f / tickrate;
+CvarInfo g_ResetCvars[] = { "sv_maxrate", "sv_minrate", "net_splitpacket_maxrate" };
+size_t g_iResetCvarsCount = sizeof(g_ResetCvars) / sizeof(g_ResetCvars[0]);
+
+static float Handler_GetTickInterval()
+{
+	float fDefTickInterval = SH_CALL(g_pGameDll, &IServerGameDLL::GetTickInterval)();
+	float fTickInterval = fDefTickInterval;
+
+	if (CommandLine()->CheckParm("-tickrate")) {
+		float fTickRate = CommandLine()->ParmValue("-tickrate", 0);
+
+		if (fTickRate > 10) {
+			fTickInterval = 1.0f / fTickRate;
+
+			Msg("[Tickrate_Enabler] Applied tickrate %.2f (interval %.6f); Default tickrate: %.2f (interval: %.6f).\n", fTickRate, fTickInterval, 1.0f / fDefTickInterval, fDefTickInterval);
+		}
 	}
 
-	RETURN_META_VALUE(MRES_SUPERCEDE, tickinterval);
+	RETURN_META_VALUE(MRES_SUPERCEDE, fTickInterval);
 }
-
-IServerGameDLL* gamedll = NULL;
-IVEngineServer* engine = NULL;
-ICvar* g_pCvar = NULL;
 
 //---------------------------------------------------------------------------------
 // Purpose: called when the plugin is loaded, load the interface we need from the engine
 //---------------------------------------------------------------------------------
 bool L4DTickRate::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory)
 {
-	gamedll = (IServerGameDLL*)gameServerFactory(INTERFACEVERSION_SERVERGAMEDLL, NULL);
-	if (!gamedll)
-	{
-		Error("Tickrate_Enabler: Failed to get a pointer on ServerGameDLL.\n");
+	g_pGameDll = reinterpret_cast<IServerGameDLL*>(gameServerFactory(INTERFACEVERSION_SERVERGAMEDLL, NULL));
+	if (g_pGameDll == NULL) {
+		Error("[Tickrate_Enabler] Failed to get a pointer on 'IServerGameDLL' interface.\n");
 		return false;
 	}
 
-	engine = (IVEngineServer*)interfaceFactory(INTERFACEVERSION_VENGINESERVER, NULL);
+	g_pEngine = reinterpret_cast<IVEngineServer*>(interfaceFactory(INTERFACEVERSION_VENGINESERVER, NULL));
+	if (g_pEngine == NULL) {
+		Error("[Tickrate_Enabler] Failed to get a pointer on 'IVEngineServer' interface.\n");
+		return false;
+	}
 
-	SH_ADD_HOOK(IServerGameDLL, GetTickInterval, gamedll, SH_STATIC(GetTickInterval), false);
+	g_pCvar = reinterpret_cast<ICvar*>(interfaceFactory(CVAR_INTERFACE_VERSION, NULL));
+	if (g_pCvar == NULL) {
+		Error("[Tickrate_Enabler] Failed to get a pointer on 'ICvar' interface.\n");
+		return false;
+	}
 
-	try
-	{
-		m_patchManager.Register(new BoomerVomitFrameTimePatch(gamedll));
-		m_patchManager.Register(new NetChanDataRatePatch((BYTE*)engine));
+	SH_ADD_HOOK(IServerGameDLL, GetTickInterval, g_pGameDll, SH_STATIC(Handler_GetTickInterval), false);
+
+	try {
+		m_patchManager.Register(new BoomerVomitFrameTimePatch(g_pGameDll));
+		m_patchManager.Register(new NetChanDataRatePatch((BYTE*)g_pEngine));
 #if defined (CGAMECLIENT_PATCH)
-		m_patchManager.Register(new GameClientSetRatePatch((BYTE*)engine));
+		m_patchManager.Register(new GameClientSetRatePatch((BYTE*)g_pEngine));
 #endif
 #if defined (CLAMPCLIENTRATE_PATCH)
-		m_patchManager.Register(new ClampClientRatePatch((BYTE*)engine));
+		m_patchManager.Register(new ClampClientRatePatch((BYTE*)g_pEngine));
 #endif
 
 		m_patchManager.PatchAll();
-	}
-	catch (PatchException& e)
-	{
+	} catch (PatchException& e) {
 		Error("!!!!!\nPatch Failure: %s\n!!!!!\n", e.GetDescription());
 		Error("Failed to process all tickrate_enabler patches, bailing out.\n");
 		return false;
 	}
 
-	g_pCvar = reinterpret_cast<ICvar*>(interfaceFactory(CVAR_INTERFACE_VERSION, NULL));
-	if (g_pCvar == NULL)
-	{
-		Error("RecordingHelpers: Failed to get Cvar interface.\n");
-		return false;
+	for (size_t i = 0; i < g_iResetCvarsCount; i++) {
+		ConVar* pCvar = g_pCvar->FindVar(g_ResetCvars[i].GetName());
+
+		if (pCvar == NULL) {
+			Msg("[Tickrate_Enabler] Can't find convar '%s'.""\n", g_ResetCvars[i].GetName());
+			continue;
+		}
+
+		g_ResetCvars[i].m_bDefaultHasMax = pCvar->m_bHasMax;
+		g_ResetCvars[i].m_fDefaultMaxValue = pCvar->m_fMaxVal;
+
+		pCvar->m_bHasMax = false;
+		pCvar->m_fMaxVal = 0.0f;
 	}
-
-	g_pCvar->FindVar("sv_maxrate")->m_bHasMax = false;
-	g_pCvar->FindVar("sv_maxrate")->m_fMaxVal = 0.0f;
-
-	g_pCvar->FindVar("sv_minrate")->m_bHasMax = false;
-	g_pCvar->FindVar("sv_minrate")->m_fMaxVal = 0.0f;
-
-	g_pCvar->FindVar("net_splitpacket_maxrate")->m_bHasMax = false;
-	g_pCvar->FindVar("net_splitpacket_maxrate")->m_fMaxVal = 0.0f;
 
 	return true;
 }
@@ -150,19 +149,22 @@ bool L4DTickRate::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gam
 //---------------------------------------------------------------------------------
 void L4DTickRate::Unload(void)
 {
-	g_pCvar->FindVar("sv_maxrate")->m_bHasMax = true;
-	g_pCvar->FindVar("sv_maxrate")->m_fMaxVal = 30000.0f;
+	for (size_t i = 0; i < g_iResetCvarsCount; i++) {
+		ConVar* pCvar = g_pCvar->FindVar(g_ResetCvars[i].GetName());
 
-	g_pCvar->FindVar("sv_minrate")->m_bHasMax = true;
-	g_pCvar->FindVar("sv_minrate")->m_fMaxVal = 30000.0f;
+		if (pCvar == NULL) {
+			Msg("[Tickrate_Enabler] Can't find convar '%s'.""\n", g_ResetCvars[i].GetName());
+			continue;
+		}
 
-	g_pCvar->FindVar("net_splitpacket_maxrate")->m_bHasMax = true;
-	g_pCvar->FindVar("net_splitpacket_maxrate")->m_fMaxVal = 30000.0f;
+		pCvar->m_bHasMax = g_ResetCvars[i].m_bDefaultHasMax;
+		pCvar->m_fMaxVal = g_ResetCvars[i].m_fDefaultMaxValue;
+	}
 
 	m_patchManager.UnpatchAll();
 	m_patchManager.UnregisterAll();
 
-	SH_REMOVE_HOOK(IServerGameDLL, GetTickInterval, gamedll, SH_STATIC(GetTickInterval), false);
+	SH_REMOVE_HOOK(IServerGameDLL, GetTickInterval, g_pGameDll, SH_STATIC(Handler_GetTickInterval), false);
 }
 
 //---------------------------------------------------------------------------------
@@ -170,5 +172,9 @@ void L4DTickRate::Unload(void)
 //---------------------------------------------------------------------------------
 const char* L4DTickRate::GetPluginDescription(void)
 {
-	return "Tickrate_Enabler " VERSION ", ProdigySim";
+#ifdef _DEBUG
+	return "Tickrate_Enabler " TE_VERSION " (dev), ProdigySim.";
+#else 
+	return "Tickrate_Enabler " TE_VERSION ", ProdigySim.";
+#endif
 }
