@@ -30,13 +30,36 @@
  */
 #ifndef __TICKRATE_ENABLER_H__
 #define __TICKRATE_ENABLER_H__
+
 #include "eiface.h"
-#include "codepatch/patchmanager.h"
+#include "thirdparty/codepatch/patchmanager.h"
+
+class CvarInfo
+{
+public:
+	CvarInfo(const char* sName)
+	{
+		strncpy(m_sCvarName, sName, sizeof(m_sCvarName) - 1);
+		m_sCvarName[sizeof(m_sCvarName) - 1] = '\0';
+	}
+
+	const char* GetName()
+	{
+		return m_sCvarName;
+	}
+
+private:
+	char m_sCvarName[128];
+
+public:
+	float m_fDefaultMaxValue;
+	bool m_bDefaultHasMax;
+};
 
 class L4DTickRate: public IServerPluginCallbacks
 {
 public:
-	L4DTickRate();
+	L4DTickRate() {}
 
 	virtual bool			Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory);
 	virtual void			Unload(void);
