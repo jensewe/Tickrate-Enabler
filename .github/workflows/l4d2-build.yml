@@ -22,35 +22,27 @@ on:
 
 jobs:
   build:
-    name: build on ${{ matrix.os_short }} SM-${{ matrix.sm_version }} MMS-${{ matrix.mm_version }}
+    name: build on ${{ matrix.os_short }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
-          - ubuntu-20.04
           - windows-latest
 
         sm_version:
           - "master"
-          - "1.11"
 
         mm_version:
-          - "1.10"
+          - "master"
 
         include:
-          - mm_version: "1.10"
-            mm_branch: "1.10-dev"
+          - mm_version: "master"
+            mm_branch: "master"
 
           - sm_version: "master"
             sm_branch: "master"
-
-          - sm_version: "1.11"
-            sm_branch: "1.11-dev"
-
-          - os: ubuntu-20.04
-            os_short: oldlinux
 
           - os: ubuntu-latest
             os_short: linux
@@ -137,5 +129,5 @@ jobs:
       - name: Uploading package
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.repository.name }}-l4d2-${{ matrix.os_short }}-sm${{ matrix.sm_version }}-${{ env.GITHUB_SHA_SHORT }}
+          name: ${{ github.event.repository.name }}-l4d2-${{ matrix.os_short }}-${{ env.GITHUB_SHA_SHORT }}
           path: src/build/package
