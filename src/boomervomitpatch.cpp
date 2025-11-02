@@ -29,7 +29,7 @@
  * Version: $Id$
  */
 #include <cstdlib>
-#include "memutils.h"
+#include "thirdparty/memutils.h"
 #include "boomervomitpatch.h"
 #include "patchexceptions.h"
 
@@ -46,7 +46,7 @@ fakeGlobals *gp_FakeGlobals = &g_FakeGlobals;
 #endif
 #endif
 
-BoomerVomitFrameTimePatch::BoomerVomitFrameTimePatch(IServerGameDLL * gamedll)
+BoomerVomitFrameTimePatch::BoomerVomitFrameTimePatch(IServerGameDLL* gamedll)
 {
 	InitializeBinPatches(gamedll);
 }
@@ -66,7 +66,7 @@ void BoomerVomitFrameTimePatch::Unpatch()
 	m_patches.UnpatchAll();
 }
 
-void BoomerVomitFrameTimePatch::InitializeBinPatches(IServerGameDLL * gamedll)
+void BoomerVomitFrameTimePatch::InitializeBinPatches(IServerGameDLL* gamedll)
 {
 	BYTE instr_buf[MAX_MOV_INSTR_LEN];
 

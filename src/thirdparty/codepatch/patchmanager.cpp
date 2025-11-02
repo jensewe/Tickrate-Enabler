@@ -1,8 +1,9 @@
 /**
  * vim: set ts=4 :
  * =============================================================================
- * MaxRate Patches
+ * Patch Manager
  * Copyright (C) 2012 Michael "ProdigySim" Busby
+ * Copyright (C) 2009 Igor "Downtown1" Smirnov.
  * =============================================================================
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -28,65 +29,56 @@
  *
  * Version: $Id$
  */
-#ifndef __MAXRATE_PATCHES_H__
-#define __MAXRATE_PATCHES_H__
 
-#include "codepatch/icodepatch.h"
-#include "misc_asm.h"
+#include "patchmanager.h"
 
-#if defined (_WIN32)
-	#define CGAMECLIENT_PATCH
-#if defined (_L4D2)
-	#define CLAMPCLIENTRATE_PATCH
-#endif
-#elif defined (_LINUX)
-	#define CLAMPCLIENTRATE_PATCH
-#if defined (_L4D)
-	#define CGAMECLIENT_PATCH
-#endif
-#endif
-
-class NetChanDataRatePatch : public ICodePatch
+/* 
+	register a code patch
+*/
+void PatchManager::Register(ICodePatch* patch)
 {
-public:
-	NetChanDataRatePatch(BYTE * engine);
-	~NetChanDataRatePatch();
-	void Patch();
-	void Unpatch();
-private:
-	BYTE * FindCNetChanSetDataRate(BYTE * engine);
-	ICodePatch * GeneratePatch(BYTE * pCNetChanSetDataRate);
-	ICodePatch * m_patch;
-};
+	patchList.push_back(patch);
+}
 
-#if defined (CGAMECLIENT_PATCH)
-class GameClientSetRatePatch : public ICodePatch
+/*
+	run Patch() on all registered code patches
+*/
+void PatchManager::PatchAll()
 {
-public:
-	GameClientSetRatePatch(BYTE * engine);
-	~GameClientSetRatePatch();
-	void Patch();
-	void Unpatch();
-private:
-	BYTE * FindCGameClientSetRate(BYTE * engine);
-	ICodePatch * GeneratePatch(BYTE * pCGameClientSetRate);
-	ICodePatch * m_patch;
-};
-#endif
+	for(PatchList::iterator iter = patchList.begin(); iter != patchList.end(); ++iter)
+	{
+		ICodePatch *patch = *iter;
+		patch->Patch();
+	}
+}
 
-#if defined (CLAMPCLIENTRATE_PATCH)
-class ClampClientRatePatch : public ICodePatch
+/*
+	run Unpatch() on all registered code patches
+*/
+void PatchManager::UnpatchAll()
 {
-public:
-	ClampClientRatePatch(BYTE * engine);
-	~ClampClientRatePatch();
-	void Patch();
-	void Unpatch();
-private:
-	BYTE * FindClampClientRate(BYTE * engine);
-	ICodePatch * GeneratePatch(BYTE * pClampClientRate);
-	ICodePatch * m_patch;
-};
-#endif
+	for(PatchList::iterator iter = patchList.begin(); iter != patchList.end(); ++iter)
+	{
+		ICodePatch *patch = *iter;
+		patch->Unpatch();
+	}
+}
 
-#endif
+/*
+	unregister all code patches, deleting every one of them
+*/
+void PatchManager::UnregisterAll()
+{
+	for(PatchList::iterator iter = patchList.begin(); iter != patchList.end(); ++iter)
+	{
+		ICodePatch *patch = *iter;
+		delete patch;
+	}
+
+	patchList.clear();
+}
+
+PatchManager::~PatchManager()
+{
+	UnregisterAll();
+}

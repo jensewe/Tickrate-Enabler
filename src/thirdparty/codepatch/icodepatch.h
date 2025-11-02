@@ -1,8 +1,9 @@
 /**
  * vim: set ts=4 :
  * =============================================================================
- * MaxRate Patches
+ * ICodePatch
  * Copyright (C) 2012 Michael "ProdigySim" Busby
+ * Copyright (C) 2009 Igor "Downtown1" Smirnov.
  * =============================================================================
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -28,36 +29,32 @@
  *
  * Version: $Id$
  */
-#ifndef __UPDATERATE_PATCHES_H__
-#define __UPDATERATE_PATCHES_H__
 
-#include "codepatch/icodepatch.h"
-#include "misc_asm.h"
+#ifndef _INCLUDE_SOURCEMOD_ICODEPATCH_H_
+#define _INCLUDE_SOURCEMOD_ICODEPATCH_H_
 
-class CGameClientUpdateRatePatch : public ICodePatch
+/*
+A simple interface for a patch that can change code memory or restore it to the original state
+
+NOTE: To use this with PatchManager make sure to inherit public ICodePatch
+*/
+class ICodePatch
 {
 public:
-	CGameClientUpdateRatePatch(BYTE * engine);
-	~CGameClientUpdateRatePatch();
-	void Patch();
-	void Unpatch();
-private:
-	BYTE * FindCGameClientSetUpdateRate(BYTE * engine);
-	ICodePatch * GeneratePatch(BYTE * pCGameClientUpdateRate);
-	ICodePatch * m_patch;
-};
+	/* 
+		patch the code memory
+	*/
+	virtual void Patch() = 0;
 
-class CBaseClientUpdateRatePatch : public ICodePatch
-{
-public:
-	CBaseClientUpdateRatePatch(BYTE * engine);
-	~CBaseClientUpdateRatePatch();
-	void Patch();
-	void Unpatch();
-private:
-	BYTE * FindCBaseClientSetUpdateRate(BYTE * engine);
-	ICodePatch * GeneratePatch(BYTE * pCBaseClientUpdateRate);
-	ICodePatch * m_patch;
+	/*
+		unpatch the code memory, restoring it to its original state
+	*/
+	virtual void Unpatch() = 0;
+
+	/*
+		so that we can delete
+	*/
+	virtual ~ICodePatch() {}
 };
 
 #endif

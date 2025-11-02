@@ -31,9 +31,9 @@
 #ifndef _BASICBINPATCH_H_
 #define _BASICBINPATCH_H_
 
-#include "codepatch/icodepatch.h"
+#include "thirdparty/codepatch/icodepatch.h"
 
-#include "memutils.h"
+#include "thirdparty/memutils.h"
 
 
 // Basic binary patch that can be calculated and cached ahead of time
