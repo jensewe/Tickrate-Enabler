@@ -31,7 +31,7 @@
 
 
 #include "updaterate_patches.h"
-#include "memutils.h"
+#include "thirdparty/memutils.h"
 #include "patchexceptions.h"
 #include "basicbinpatch.h"
 #include "sigs.h"

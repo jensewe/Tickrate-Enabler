@@ -31,7 +31,7 @@
 #ifndef __UPDATERATE_PATCHES_H__
 #define __UPDATERATE_PATCHES_H__
 
-#include "codepatch/icodepatch.h"
+#include "thirdparty/codepatch/icodepatch.h"
 #include "misc_asm.h"
 
 class CGameClientUpdateRatePatch : public ICodePatch
