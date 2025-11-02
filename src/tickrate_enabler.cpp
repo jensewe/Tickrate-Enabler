@@ -44,6 +44,7 @@
 
 #include "boomervomitpatch.h"
 #include "maxrate_patches.h"
+#include "updaterate_patches.h"
 
  // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -118,6 +119,8 @@ bool L4DTickRate::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gam
 #if defined (CLAMPCLIENTRATE_PATCH)
 		m_patchManager.Register(new ClampClientRatePatch((BYTE*)g_pEngine));
 #endif
+		m_patchManager.Register(new CGameClientUpdateRatePatch((BYTE *)g_pEngine));
+		m_patchManager.Register(new CBaseClientUpdateRatePatch((BYTE *)g_pEngine));
 
 		m_patchManager.PatchAll();
 	} catch (PatchException& e) {
